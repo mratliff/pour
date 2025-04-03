@@ -35,6 +35,10 @@ defmodule PourWeb.Router do
     live "/regions/:id", RegionLive.Show, :show
     live "/regions/:id/edit", RegionLive.Form, :edit
 
+    live "/subregions", SubregionLive.Index, :index
+    live "/subregions/new", SubregionLive.Form, :new
+    live "/subregions/:id", SubregionLive.Show, :show
+    live "/subregions/:id/edit", SubregionLive.Form, :edit
     get "/", PageController, :home
   end
 

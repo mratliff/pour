@@ -197,4 +197,100 @@ defmodule Pour.WineRegions do
   def change_region(%Region{} = region, attrs \\ %{}) do
     Region.changeset(region, attrs)
   end
+
+  alias Pour.WineRegions.Subregion
+
+  @doc """
+  Returns the list of subregions.
+
+  ## Examples
+
+      iex> list_subregions()
+      [%Subregion{}, ...]
+
+  """
+  def list_subregions do
+    Repo.all(Subregion)
+  end
+
+  @doc """
+  Gets a single subregion.
+
+  Raises `Ecto.NoResultsError` if the Subregion does not exist.
+
+  ## Examples
+
+      iex> get_subregion!(123)
+      %Subregion{}
+
+      iex> get_subregion!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_subregion!(id), do: Repo.get!(Subregion, id)
+
+  @doc """
+  Creates a subregion.
+
+  ## Examples
+
+      iex> create_subregion(%{field: value})
+      {:ok, %Subregion{}}
+
+      iex> create_subregion(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_subregion(attrs \\ %{}) do
+    %Subregion{}
+    |> Subregion.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a subregion.
+
+  ## Examples
+
+      iex> update_subregion(subregion, %{field: new_value})
+      {:ok, %Subregion{}}
+
+      iex> update_subregion(subregion, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_subregion(%Subregion{} = subregion, attrs) do
+    subregion
+    |> Subregion.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a subregion.
+
+  ## Examples
+
+      iex> delete_subregion(subregion)
+      {:ok, %Subregion{}}
+
+      iex> delete_subregion(subregion)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_subregion(%Subregion{} = subregion) do
+    Repo.delete(subregion)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking subregion changes.
+
+  ## Examples
+
+      iex> change_subregion(subregion)
+      %Ecto.Changeset{data: %Subregion{}}
+
+  """
+  def change_subregion(%Subregion{} = subregion, attrs \\ %{}) do
+    Subregion.changeset(subregion, attrs)
+  end
 end

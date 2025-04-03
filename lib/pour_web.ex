@@ -87,6 +87,7 @@ defmodule PourWeb do
       # Core UI components
       import PourWeb.CoreComponents
 
+      import PourWeb.Helpers
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias PourWeb.Layouts

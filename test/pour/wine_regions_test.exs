@@ -111,4 +111,61 @@ defmodule Pour.WineRegionsTest do
       assert %Ecto.Changeset{} = WineRegions.change_region(region)
     end
   end
+
+  describe "subregions" do
+    alias Pour.WineRegions.Subregion
+
+    import Pour.WineRegionsFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_subregions/0 returns all subregions" do
+      subregion = subregion_fixture()
+      assert WineRegions.list_subregions() == [subregion]
+    end
+
+    test "get_subregion!/1 returns the subregion with given id" do
+      subregion = subregion_fixture()
+      assert WineRegions.get_subregion!(subregion.id) == subregion
+    end
+
+    test "create_subregion/1 with valid data creates a subregion" do
+      region = region_fixture()
+      valid_attrs = %{name: "some name", region_id: region.id}
+
+      assert {:ok, %Subregion{} = subregion} = WineRegions.create_subregion(valid_attrs)
+      assert subregion.name == "some name"
+    end
+
+    test "create_subregion/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = WineRegions.create_subregion(@invalid_attrs)
+    end
+
+    test "update_subregion/2 with valid data updates the subregion" do
+      subregion = subregion_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %Subregion{} = subregion} =
+               WineRegions.update_subregion(subregion, update_attrs)
+
+      assert subregion.name == "some updated name"
+    end
+
+    test "update_subregion/2 with invalid data returns error changeset" do
+      subregion = subregion_fixture()
+      assert {:error, %Ecto.Changeset{}} = WineRegions.update_subregion(subregion, @invalid_attrs)
+      assert subregion == WineRegions.get_subregion!(subregion.id)
+    end
+
+    test "delete_subregion/1 deletes the subregion" do
+      subregion = subregion_fixture()
+      assert {:ok, %Subregion{}} = WineRegions.delete_subregion(subregion)
+      assert_raise Ecto.NoResultsError, fn -> WineRegions.get_subregion!(subregion.id) end
+    end
+
+    test "change_subregion/1 returns a subregion changeset" do
+      subregion = subregion_fixture()
+      assert %Ecto.Changeset{} = WineRegions.change_subregion(subregion)
+    end
+  end
 end

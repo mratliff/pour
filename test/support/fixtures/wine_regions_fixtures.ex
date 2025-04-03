@@ -34,4 +34,21 @@ defmodule Pour.WineRegionsFixtures do
 
     region
   end
+
+  @doc """
+  Generate a subregion.
+  """
+  def subregion_fixture(attrs \\ %{}) do
+    region = region_fixture()
+
+    {:ok, subregion} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        region_id: region.id
+      })
+      |> Pour.WineRegions.create_subregion()
+
+    subregion
+  end
 end

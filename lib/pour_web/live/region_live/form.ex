@@ -93,10 +93,4 @@ defmodule PourWeb.RegionLive.Form do
 
   defp return_path("index", _region), do: ~p"/regions"
   defp return_path("show", region), do: ~p"/regions/#{region}"
-
-  defp list_select_for(named_entity_list) do
-    Enum.map(named_entity_list, fn %{id: id, name: name} ->
-      {name, id}
-    end)
-  end
 end
