@@ -22,10 +22,13 @@ defmodule Pour.WineRegionsFixtures do
   Generate a region.
   """
   def region_fixture(attrs \\ %{}) do
+    country = country_fixture()
+
     {:ok, region} =
       attrs
       |> Enum.into(%{
-        name: "some name"
+        name: "some name",
+        country_id: country.id
       })
       |> Pour.WineRegions.create_region()
 

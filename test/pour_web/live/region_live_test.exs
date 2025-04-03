@@ -13,8 +13,14 @@ defmodule PourWeb.RegionLiveTest do
     %{region: region}
   end
 
+  defp create_country(_) do
+    country = country_fixture()
+
+    %{country: country}
+  end
+
   describe "Index" do
-    setup [:create_region]
+    setup [:create_region, :create_country]
 
     test "lists all regions", %{conn: conn, region: region} do
       {:ok, _index_live, html} = live(conn, ~p"/regions")
@@ -23,7 +29,7 @@ defmodule PourWeb.RegionLiveTest do
       assert html =~ region.name
     end
 
-    test "saves new region", %{conn: conn} do
+    test "saves new region", %{conn: conn, country: country} do
       {:ok, index_live, _html} = live(conn, ~p"/regions")
 
       assert {:ok, form_live, _} =
@@ -40,7 +46,7 @@ defmodule PourWeb.RegionLiveTest do
 
       assert {:ok, index_live, _html} =
                form_live
-               |> form("#region-form", region: @create_attrs)
+               |> form("#region-form", region: Map.put(@create_attrs, :country_id, country.id))
                |> render_submit()
                |> follow_redirect(conn, ~p"/regions")
 

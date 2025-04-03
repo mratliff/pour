@@ -75,7 +75,8 @@ defmodule Pour.WineRegionsTest do
     end
 
     test "create_region/1 with valid data creates a region" do
-      valid_attrs = %{name: "some name"}
+      country = country_fixture()
+      valid_attrs = %{name: "some name", country_id: country.id}
 
       assert {:ok, %Region{} = region} = WineRegions.create_region(valid_attrs)
       assert region.name == "some name"

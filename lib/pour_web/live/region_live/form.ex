@@ -15,6 +15,7 @@ defmodule PourWeb.RegionLive.Form do
 
       <.form for={@form} id="region-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
+        <.input type="select" label="Country" field={@form[:country_id]} options={@countries} />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Region</.button>
           <.button navigate={return_path(@return_to, @region)}>Cancel</.button>
@@ -29,6 +30,7 @@ defmodule PourWeb.RegionLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
+     |> assign(:countries, list_select_for(WineRegions.list_countries()))
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -91,4 +93,10 @@ defmodule PourWeb.RegionLive.Form do
 
   defp return_path("index", _region), do: ~p"/regions"
   defp return_path("show", region), do: ~p"/regions/#{region}"
+
+  defp list_select_for(named_entity_list) do
+    Enum.map(named_entity_list, fn %{id: id, name: name} ->
+      {name, id}
+    end)
+  end
 end
