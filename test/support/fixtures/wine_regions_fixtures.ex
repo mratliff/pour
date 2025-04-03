@@ -32,7 +32,7 @@ defmodule Pour.WineRegionsFixtures do
       })
       |> Pour.WineRegions.create_region()
 
-    region
+    %{region | country: country}
   end
 
   @doc """
@@ -49,6 +49,6 @@ defmodule Pour.WineRegionsFixtures do
       })
       |> Pour.WineRegions.create_subregion()
 
-    subregion
+    %{subregion | region: region}
   end
 end

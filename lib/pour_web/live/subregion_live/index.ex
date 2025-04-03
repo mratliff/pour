@@ -8,7 +8,7 @@ defmodule PourWeb.SubregionLive.Index do
     ~H"""
     <Layouts.app flash={@flash}>
       <.header>
-        Listing Subregions
+        Listing Sub Regions
         <:actions>
           <.button variant="primary" navigate={~p"/subregions/new"}>
             <.icon name="hero-plus" /> New Subregion
@@ -22,6 +22,8 @@ defmodule PourWeb.SubregionLive.Index do
         row_click={fn {_id, subregion} -> JS.navigate(~p"/subregions/#{subregion}") end}
       >
         <:col :let={{_id, subregion}} label="Name">{subregion.name}</:col>
+        <:col :let={{_id, subregion}} label="Region">{subregion.region.name}</:col>
+        <:col :let={{_id, subregion}} label="Country">{subregion.region.country.name}</:col>
         <:action :let={{_id, subregion}}>
           <div class="sr-only">
             <.link navigate={~p"/subregions/#{subregion}"}>Show</.link>

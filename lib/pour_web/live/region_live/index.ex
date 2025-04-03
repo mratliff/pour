@@ -22,6 +22,7 @@ defmodule PourWeb.RegionLive.Index do
         row_click={fn {_id, region} -> JS.navigate(~p"/regions/#{region}") end}
       >
         <:col :let={{_id, region}} label="Name">{region.name}</:col>
+        <:col :let={{_id, region}} label="Country">{region.country.name}</:col>
         <:action :let={{_id, region}}>
           <div class="sr-only">
             <.link navigate={~p"/regions/#{region}"}>Show</.link>

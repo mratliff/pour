@@ -114,7 +114,7 @@ defmodule Pour.WineRegions do
 
   """
   def list_regions do
-    Repo.all(Region)
+    from(r in Region, left_join: country in assoc(r, :country), preload: [:country]) |> Repo.all()
   end
 
   @doc """
@@ -131,7 +131,7 @@ defmodule Pour.WineRegions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_region!(id), do: Repo.get!(Region, id)
+  def get_region!(id), do: Repo.get!(Region, id) |> Repo.preload(:country)
 
   @doc """
   Creates a region.
@@ -210,7 +210,12 @@ defmodule Pour.WineRegions do
 
   """
   def list_subregions do
-    Repo.all(Subregion)
+    from(s in Subregion,
+      left_join: region in assoc(s, :region),
+      left_join: country in assoc(region, :country),
+      preload: [region: {region, country: country}]
+    )
+    |> Repo.all()
   end
 
   @doc """
@@ -227,7 +232,15 @@ defmodule Pour.WineRegions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_subregion!(id), do: Repo.get!(Subregion, id)
+  def get_subregion!(id) do
+    from(subregion in Subregion,
+      where: subregion.id == ^id,
+      left_join: region in assoc(subregion, :region),
+      left_join: country in assoc(region, :country),
+      preload: [region: {region, country: country}]
+    )
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a subregion.
