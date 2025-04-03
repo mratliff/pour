@@ -30,6 +30,11 @@ defmodule PourWeb.Router do
     live "/countries/:id", CountryLive.Show, :show
     live "/countries/:id/edit", CountryLive.Form, :edit
 
+    live "/regions", RegionLive.Index, :index
+    live "/regions/new", RegionLive.Form, :new
+    live "/regions/:id", RegionLive.Show, :show
+    live "/regions/:id/edit", RegionLive.Form, :edit
+
     get "/", PageController, :home
   end
 
