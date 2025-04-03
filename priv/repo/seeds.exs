@@ -681,6 +681,11 @@ varietals
   {:ok, _new_varietal} = Pour.Varietals.create_varietal(%{name: varietal})
 end)
 
+1800..2030
+|> Enum.each(fn year ->
+  {:ok, _new_year} = Pour.Vintages.create_vintage(%{year: year})
+end)
+
 region_data
 |> Enum.map(fn {country, regions} ->
   {:ok, new_country} = Pour.WineRegions.create_country(%{name: country})
