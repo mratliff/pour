@@ -20,6 +20,11 @@ defmodule PourWeb.Router do
   scope "/", PourWeb do
     pipe_through :browser
 
+    live "/wines", WineLive.Index, :index
+    live "/wines/new", WineLive.Form, :new
+    live "/wines/:id", WineLive.Show, :show
+    live "/wines/:id/edit", WineLive.Form, :edit
+
     get "/", PageController, :home
   end
 
