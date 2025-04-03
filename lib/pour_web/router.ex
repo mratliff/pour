@@ -25,6 +25,11 @@ defmodule PourWeb.Router do
     live "/wines/:id", WineLive.Show, :show
     live "/wines/:id/edit", WineLive.Form, :edit
 
+    live "/countries", CountryLive.Index, :index
+    live "/countries/new", CountryLive.Form, :new
+    live "/countries/:id", CountryLive.Show, :show
+    live "/countries/:id/edit", CountryLive.Form, :edit
+
     get "/", PageController, :home
   end
 
