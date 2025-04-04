@@ -117,6 +117,15 @@ defmodule Pour.WineRegions do
     from(r in Region, left_join: country in assoc(r, :country), preload: [:country]) |> Repo.all()
   end
 
+  def list_regions(for_country_id) do
+    from(r in Region,
+      left_join: country in assoc(r, :country),
+      where: country.id == ^for_country_id,
+      preload: [:country]
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single region.
 
@@ -213,6 +222,16 @@ defmodule Pour.WineRegions do
     from(s in Subregion,
       left_join: region in assoc(s, :region),
       left_join: country in assoc(region, :country),
+      preload: [region: {region, country: country}]
+    )
+    |> Repo.all()
+  end
+
+  def list_subregions(for_region_id) do
+    from(s in Subregion,
+      left_join: region in assoc(s, :region),
+      left_join: country in assoc(region, :country),
+      where: region.id == ^for_region_id,
       preload: [region: {region, country: country}]
     )
     |> Repo.all()

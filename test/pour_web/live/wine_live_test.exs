@@ -4,8 +4,14 @@ defmodule PourWeb.WineLiveTest do
   import Phoenix.LiveViewTest
   import Pour.CatalogFixtures
 
-  @create_attrs %{name: "some name", description: "some description"}
-  @update_attrs %{name: "some updated name", description: "some updated description"}
+  # @create_attrs %{name: "some name", description: "some description"}
+  @update_attrs %{
+    name: "some updated name",
+    description: "some updated description",
+    price: 100,
+    local_price: 100,
+    vintage_id: 1
+  }
   @invalid_attrs %{name: nil, description: nil}
   defp create_wine(_) do
     wine = wine_fixture()
@@ -23,7 +29,7 @@ defmodule PourWeb.WineLiveTest do
       assert html =~ wine.name
     end
 
-    test "saves new wine", %{conn: conn} do
+    test "saves new wine", %{conn: conn, wine: wine} do
       {:ok, index_live, _html} = live(conn, ~p"/wines")
 
       assert {:ok, form_live, _} =
@@ -38,9 +44,17 @@ defmodule PourWeb.WineLiveTest do
              |> form("#wine-form", wine: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
+      attrs =
+        @update_attrs
+        |> Map.put(:country_id, wine.country_id)
+        |> Map.put(:region_id, wine.region_id)
+        |> Map.put(:sub_region_id, wine.sub_region_id)
+
       assert {:ok, index_live, _html} =
                form_live
-               |> form("#wine-form", wine: @create_attrs)
+               |> form("#wine-form",
+                 wine: attrs
+               )
                |> render_submit()
                |> follow_redirect(conn, ~p"/wines")
 
@@ -108,9 +122,17 @@ defmodule PourWeb.WineLiveTest do
              |> form("#wine-form", wine: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
+      attrs =
+        @update_attrs
+        |> Map.put(:country_id, wine.country_id)
+        |> Map.put(:region_id, wine.region_id)
+        |> Map.put(:sub_region_id, wine.sub_region_id)
+
       assert {:ok, show_live, _html} =
                form_live
-               |> form("#wine-form", wine: @update_attrs)
+               |> form("#wine-form",
+                 wine: attrs
+               )
                |> render_submit()
                |> follow_redirect(conn, ~p"/wines/#{wine}")
 

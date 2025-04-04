@@ -19,6 +19,7 @@ defmodule Pour.Vintages do
   """
   def list_vintages do
     Repo.all(Vintage)
+    |> Enum.sort_by(& &1.year, :desc)
   end
 
   @doc """

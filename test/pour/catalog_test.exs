@@ -21,7 +21,18 @@ defmodule Pour.CatalogTest do
     end
 
     test "create_wine/1 with valid data creates a wine" do
-      valid_attrs = %{name: "some name", description: "some description"}
+      sub_region = Pour.WineRegionsFixtures.subregion_fixture()
+
+      valid_attrs = %{
+        name: "some name",
+        description: "some description",
+        sub_region_id: sub_region.id,
+        region_id: sub_region.region_id,
+        country_id: sub_region.region.country_id,
+        price: 100,
+        local_price: 100.1,
+        vintage_id: Pour.VintagesFixtures.vintage_fixture().id
+      }
 
       assert {:ok, %Wine{} = wine} = Catalog.create_wine(valid_attrs)
       assert wine.name == "some name"

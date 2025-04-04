@@ -1,19 +1,49 @@
 defmodule Pour.Catalog.Wine do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Pour.Vintages.Vintage
+  alias Pour.WineRegions.Region
+  alias Pour.WineRegions.Subregion
+  alias Pour.WineRegions.Country
 
   schema "wines" do
     field :name, :string
     field :description, :string
     field :price, :decimal
+    field :local_price, :decimal
     field :views, :integer, default: 0
+    belongs_to :vintage, Vintage
+    belongs_to :region, Region
+    belongs_to :sub_region, Subregion
+    belongs_to :country, Country
     timestamps(type: :utc_datetime)
   end
+
+  # TODO: validate subregion if one exists for Region
 
   @doc false
   def changeset(wine, attrs) do
     wine
-    |> cast(attrs, [:name, :description])
-    |> validate_required([:name, :description])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :price,
+      :local_price,
+      :views,
+      :vintage_id,
+      :region_id,
+      :sub_region_id,
+      :country_id
+    ])
+    |> validate_required([
+      :name,
+      :description,
+      :price,
+      :local_price,
+      :views,
+      :vintage_id,
+      :region_id,
+      :country_id
+    ])
   end
 end
