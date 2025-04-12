@@ -6,7 +6,7 @@ defmodule PourWeb.UserAuth do
 
   alias Pour.Accounts
   alias Pour.Accounts.Scope
-
+  alias Pour.ShoppingCart
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
   # the token expiry itself in UserToken.
@@ -185,6 +185,18 @@ defmodule PourWeb.UserAuth do
 
       {:halt, socket}
     end
+  end
+
+  def on_mount(:load_cart, _params, _session, socket) do
+    socket =
+      if cart = ShoppingCart.get_cart(socket.assigns.current_scope) do
+        Phoenix.Component.assign_new(socket, :cart, fn -> cart end)
+      else
+        {:ok, new_cart} = ShoppingCart.create_cart(socket.assigns.current_scope)
+        Phoenix.Component.assign_new(socket, :cart, fn -> new_cart end)
+      end
+
+    {:cont, socket}
   end
 
   defp mount_current_scope(socket, session) do

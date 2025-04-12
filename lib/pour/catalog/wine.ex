@@ -12,6 +12,7 @@ defmodule Pour.Catalog.Wine do
     field :price, :decimal
     field :local_price, :decimal
     field :views, :integer, default: 0
+    field :available, :boolean, default: false
     belongs_to :vintage, Vintage
     belongs_to :region, Region
     belongs_to :sub_region, Subregion
@@ -29,6 +30,7 @@ defmodule Pour.Catalog.Wine do
       :description,
       :price,
       :local_price,
+      :available,
       :views,
       :vintage_id,
       :region_id,

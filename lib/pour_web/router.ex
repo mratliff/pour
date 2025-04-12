@@ -75,6 +75,16 @@ defmodule PourWeb.Router do
   scope "/", PourWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    live_session :authenticated,
+      on_mount: [{PourWeb.UserAuth, :mount_current_scope}, {PourWeb.UserAuth, :load_cart}] do
+      live "/lot", LotLive.Index, :index
+      live "/cart", CartLive.Show, :show
+    end
+  end
+
+  scope "/", PourWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
     live_session :require_authenticated_user,
       on_mount: [{PourWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
@@ -97,4 +107,16 @@ defmodule PourWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
+
+  # defp fetch_current_cart(%{assigns: %{current_scope: scope}} = conn, _opts)
+  #      when not is_nil(scope) do
+  #   if cart = ShoppingCart.get_cart(scope) do
+  #     assign(conn, :cart, cart)
+  #   else
+  #     {:ok, new_cart} = ShoppingCart.create_cart(scope)
+  #     assign(conn, :cart, new_cart)
+  #   end
+  # end
+
+  # defp fetch_current_cart(conn, _opts), do: conn
 end

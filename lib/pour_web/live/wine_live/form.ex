@@ -18,6 +18,7 @@ defmodule PourWeb.WineLive.Form do
         <.input field={@form[:description]} type="textarea" label="Description" />
         <.input field={@form[:price]} type="number" label="Price" />
         <.input field={@form[:local_price]} type="number" label="Local Price" />
+        <.input field={@form[:available]} type="checkbox" label="Available?" />
 
         <.input field={@form[:vintage_id]} type="select" label="Vintage" options={@vintages} />
         <.input field={@form[:country_id]} type="select" label="Country" options={@countries} />

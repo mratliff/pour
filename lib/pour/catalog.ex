@@ -21,6 +21,12 @@ defmodule Pour.Catalog do
     Repo.all(Wine)
   end
 
+  def list_current_lot do
+    q = from w in Wine, where: w.available == true
+
+    Repo.all(q)
+  end
+
   @doc """
   Gets a single wine.
 
