@@ -11,10 +11,10 @@ defmodule PourWeb.WineLive.Show do
         Wine {@wine.id}
         <:subtitle>This is a wine record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/wines"}>
+          <.button navigate={~p"/admin/wines"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/wines/#{@wine}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/wines/#{@wine}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit wine
           </.button>
         </:actions>

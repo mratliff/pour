@@ -91,6 +91,6 @@ defmodule PourWeb.RegionLive.Form do
     end
   end
 
-  defp return_path("index", _region), do: ~p"/regions"
-  defp return_path("show", region), do: ~p"/regions/#{region}"
+  defp return_path("index", _region), do: ~p"/admin/regions"
+  defp return_path("show", region), do: ~p"/admin/regions/#{region}"
 end

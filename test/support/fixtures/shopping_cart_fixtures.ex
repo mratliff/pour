@@ -9,9 +9,7 @@ defmodule Pour.ShoppingCartFixtures do
   """
   def cart_fixture(scope, attrs \\ %{}) do
     attrs =
-      Enum.into(attrs, %{
-
-      })
+      Enum.into(attrs, %{})
 
     {:ok, cart} = Pour.ShoppingCart.create_cart(scope, attrs)
     cart

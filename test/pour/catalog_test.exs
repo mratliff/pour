@@ -12,7 +12,8 @@ defmodule Pour.CatalogTest do
 
     test "list_wines/0 returns all wines" do
       wine = wine_fixture()
-      assert Catalog.list_wines() == [wine]
+      assert [listed] = Catalog.list_wines()
+      assert listed.id == wine.id
     end
 
     test "get_wine!/1 returns the wine with given id" do

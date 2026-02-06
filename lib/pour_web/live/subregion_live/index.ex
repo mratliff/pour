@@ -10,7 +10,7 @@ defmodule PourWeb.SubregionLive.Index do
       <.header>
         Listing Sub Regions
         <:actions>
-          <.button variant="primary" navigate={~p"/subregions/new"}>
+          <.button variant="primary" navigate={~p"/admin/subregions/new"}>
             <.icon name="hero-plus" /> New Subregion
           </.button>
         </:actions>
@@ -19,16 +19,16 @@ defmodule PourWeb.SubregionLive.Index do
       <.table
         id="subregions"
         rows={@streams.subregions}
-        row_click={fn {_id, subregion} -> JS.navigate(~p"/subregions/#{subregion}") end}
+        row_click={fn {_id, subregion} -> JS.navigate(~p"/admin/subregions/#{subregion}") end}
       >
         <:col :let={{_id, subregion}} label="Name">{subregion.name}</:col>
         <:col :let={{_id, subregion}} label="Region">{subregion.region.name}</:col>
         <:col :let={{_id, subregion}} label="Country">{subregion.region.country.name}</:col>
         <:action :let={{_id, subregion}}>
           <div class="sr-only">
-            <.link navigate={~p"/subregions/#{subregion}"}>Show</.link>
+            <.link navigate={~p"/admin/subregions/#{subregion}"}>Show</.link>
           </div>
-          <.link navigate={~p"/subregions/#{subregion}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/subregions/#{subregion}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, subregion}}>
           <.link

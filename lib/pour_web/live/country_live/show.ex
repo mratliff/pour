@@ -11,10 +11,10 @@ defmodule PourWeb.CountryLive.Show do
         Country {@country.id}
         <:subtitle>This is a country record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/countries"}>
+          <.button navigate={~p"/admin/countries"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/countries/#{@country}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/countries/#{@country}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit country
           </.button>
         </:actions>

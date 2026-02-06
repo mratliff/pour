@@ -10,7 +10,7 @@ defmodule PourWeb.CountryLive.Index do
       <.header>
         Listing Countries
         <:actions>
-          <.button variant="primary" navigate={~p"/countries/new"}>
+          <.button variant="primary" navigate={~p"/admin/countries/new"}>
             <.icon name="hero-plus" /> New Country
           </.button>
         </:actions>
@@ -19,14 +19,14 @@ defmodule PourWeb.CountryLive.Index do
       <.table
         id="countries"
         rows={@streams.countries}
-        row_click={fn {_id, country} -> JS.navigate(~p"/countries/#{country}") end}
+        row_click={fn {_id, country} -> JS.navigate(~p"/admin/countries/#{country}") end}
       >
         <:col :let={{_id, country}} label="Name">{country.name}</:col>
         <:action :let={{_id, country}}>
           <div class="sr-only">
-            <.link navigate={~p"/countries/#{country}"}>Show</.link>
+            <.link navigate={~p"/admin/countries/#{country}"}>Show</.link>
           </div>
-          <.link navigate={~p"/countries/#{country}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/countries/#{country}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, country}}>
           <.link

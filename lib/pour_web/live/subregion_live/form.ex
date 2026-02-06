@@ -92,6 +92,6 @@ defmodule PourWeb.SubregionLive.Form do
     end
   end
 
-  defp return_path("index", _subregion), do: ~p"/subregions"
-  defp return_path("show", subregion), do: ~p"/subregions/#{subregion}"
+  defp return_path("index", _subregion), do: ~p"/admin/subregions"
+  defp return_path("show", subregion), do: ~p"/admin/subregions/#{subregion}"
 end

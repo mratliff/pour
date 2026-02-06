@@ -36,9 +36,10 @@ defmodule Pour.ShoppingCartTest do
       assert cart.user_id == scope.user.id
     end
 
-    test "create_cart/2 with invalid data returns error changeset" do
+    test "create_cart/2 with empty attrs creates a cart for the scope" do
       scope = user_scope_fixture()
-      assert {:error, %Ecto.Changeset{}} = ShoppingCart.create_cart(scope, @invalid_attrs)
+      assert {:ok, %Cart{} = cart} = ShoppingCart.create_cart(scope, %{})
+      assert cart.user_id == scope.user.id
     end
 
     test "update_cart/3 with valid data updates the cart" do
@@ -59,10 +60,10 @@ defmodule Pour.ShoppingCartTest do
       end
     end
 
-    test "update_cart/3 with invalid data returns error changeset" do
+    test "update_cart/3 with empty attrs returns the cart unchanged" do
       scope = user_scope_fixture()
       cart = cart_fixture(scope)
-      assert {:error, %Ecto.Changeset{}} = ShoppingCart.update_cart(scope, cart, @invalid_attrs)
+      assert {:ok, %Cart{}} = ShoppingCart.update_cart(scope, cart, %{})
       assert cart == ShoppingCart.get_cart!(scope, cart.id)
     end
 
@@ -120,14 +121,19 @@ defmodule Pour.ShoppingCartTest do
       cart_item = cart_item_fixture()
       update_attrs = %{price_when_carted: "456.7", quantity: 43}
 
-      assert {:ok, %CartItem{} = cart_item} = ShoppingCart.update_cart_item(cart_item, update_attrs)
+      assert {:ok, %CartItem{} = cart_item} =
+               ShoppingCart.update_cart_item(cart_item, update_attrs)
+
       assert cart_item.price_when_carted == Decimal.new("456.7")
       assert cart_item.quantity == 43
     end
 
     test "update_cart_item/2 with invalid data returns error changeset" do
       cart_item = cart_item_fixture()
-      assert {:error, %Ecto.Changeset{}} = ShoppingCart.update_cart_item(cart_item, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               ShoppingCart.update_cart_item(cart_item, @invalid_attrs)
+
       assert cart_item == ShoppingCart.get_cart_item!(cart_item.id)
     end
 

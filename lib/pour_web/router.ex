@@ -2,6 +2,7 @@ defmodule PourWeb.Router do
   use PourWeb, :router
 
   import PourWeb.UserAuth
+  alias Pour.ShoppingCart
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -11,55 +12,22 @@ defmodule PourWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
+    plug :fetch_current_cart
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
+  # Public routes (no auth required)
   scope "/", PourWeb do
     pipe_through :browser
 
-    live "/wines", WineLive.Index, :index
-    live "/wines/new", WineLive.Form, :new
-    live "/wines/:id", WineLive.Show, :show
-    live "/wines/:id/edit", WineLive.Form, :edit
-
-    live "/countries", CountryLive.Index, :index
-    live "/countries/new", CountryLive.Form, :new
-    live "/countries/:id", CountryLive.Show, :show
-    live "/countries/:id/edit", CountryLive.Form, :edit
-
-    live "/regions", RegionLive.Index, :index
-    live "/regions/new", RegionLive.Form, :new
-    live "/regions/:id", RegionLive.Show, :show
-    live "/regions/:id/edit", RegionLive.Form, :edit
-
-    live "/subregions", SubregionLive.Index, :index
-    live "/subregions/new", SubregionLive.Form, :new
-    live "/subregions/:id", SubregionLive.Show, :show
-    live "/subregions/:id/edit", SubregionLive.Form, :edit
-
-    live "/varietals", VarietalLive.Index, :index
-    live "/varietals/new", VarietalLive.Form, :new
-    live "/varietals/:id", VarietalLive.Show, :show
-    live "/varietals/:id/edit", VarietalLive.Form, :edit
-
-    get "/", PageController, :home
+    live "/", HomeLive.Index, :index
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", PourWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:pour, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
@@ -70,18 +38,71 @@ defmodule PourWeb.Router do
     end
   end
 
-  ## Authentication routes
-
+  # Pending approval page (authenticated but not necessarily approved)
   scope "/", PourWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :authenticated,
-      on_mount: [{PourWeb.UserAuth, :mount_current_scope}, {PourWeb.UserAuth, :load_cart}] do
+    live_session :pending_approval,
+      on_mount: [{PourWeb.UserAuth, :require_authenticated}] do
+      live "/pending-approval", PendingLive.Index, :index
+    end
+  end
+
+  # Admin routes (authenticated + approved + admin role)
+  scope "/admin", PourWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :admin,
+      on_mount: [
+        {PourWeb.UserAuth, :require_authenticated},
+        {PourWeb.UserAuth, :require_approved},
+        {PourWeb.UserAuth, :require_admin}
+      ] do
+      live "/users", AdminLive.Users, :index
+
+      live "/wines", WineLive.Index, :index
+      live "/wines/new", WineLive.Form, :new
+      live "/wines/:id", WineLive.Show, :show
+      live "/wines/:id/edit", WineLive.Form, :edit
+
+      live "/countries", CountryLive.Index, :index
+      live "/countries/new", CountryLive.Form, :new
+      live "/countries/:id", CountryLive.Show, :show
+      live "/countries/:id/edit", CountryLive.Form, :edit
+
+      live "/regions", RegionLive.Index, :index
+      live "/regions/new", RegionLive.Form, :new
+      live "/regions/:id", RegionLive.Show, :show
+      live "/regions/:id/edit", RegionLive.Form, :edit
+
+      live "/subregions", SubregionLive.Index, :index
+      live "/subregions/new", SubregionLive.Form, :new
+      live "/subregions/:id", SubregionLive.Show, :show
+      live "/subregions/:id/edit", SubregionLive.Form, :edit
+
+      live "/varietals", VarietalLive.Index, :index
+      live "/varietals/new", VarietalLive.Form, :new
+      live "/varietals/:id", VarietalLive.Show, :show
+      live "/varietals/:id/edit", VarietalLive.Form, :edit
+    end
+  end
+
+  # Member routes (authenticated + approved)
+  scope "/", PourWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :approved_member,
+      on_mount: [
+        {PourWeb.UserAuth, :mount_current_scope},
+        {PourWeb.UserAuth, :require_approved},
+        {PourWeb.UserAuth, :load_cart}
+      ] do
       live "/lot", LotLive.Index, :index
       live "/cart", CartLive.Show, :show
     end
   end
 
+  # User settings (authenticated, no approval required)
   scope "/", PourWeb do
     pipe_through [:browser, :require_authenticated_user]
 
@@ -94,6 +115,7 @@ defmodule PourWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
+  # Auth routes (public)
   scope "/", PourWeb do
     pipe_through [:browser]
 
@@ -108,15 +130,15 @@ defmodule PourWeb.Router do
     delete "/users/log-out", UserSessionController, :delete
   end
 
-  # defp fetch_current_cart(%{assigns: %{current_scope: scope}} = conn, _opts)
-  #      when not is_nil(scope) do
-  #   if cart = ShoppingCart.get_cart(scope) do
-  #     assign(conn, :cart, cart)
-  #   else
-  #     {:ok, new_cart} = ShoppingCart.create_cart(scope)
-  #     assign(conn, :cart, new_cart)
-  #   end
-  # end
+  defp fetch_current_cart(%{assigns: %{current_scope: scope}} = conn, _opts)
+       when not is_nil(scope) do
+    if cart = ShoppingCart.get_cart(scope) do
+      assign(conn, :cart, cart)
+    else
+      {:ok, new_cart} = ShoppingCart.create_cart(scope)
+      assign(conn, :cart, new_cart)
+    end
+  end
 
-  # defp fetch_current_cart(conn, _opts), do: conn
+  defp fetch_current_cart(conn, _opts), do: conn
 end

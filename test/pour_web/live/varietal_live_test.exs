@@ -14,23 +14,23 @@ defmodule PourWeb.VarietalLiveTest do
   end
 
   describe "Index" do
-    setup [:create_varietal]
+    setup [:register_and_log_in_admin, :create_varietal]
 
     test "lists all varietals", %{conn: conn, varietal: varietal} do
-      {:ok, _index_live, html} = live(conn, ~p"/varietals")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/varietals")
 
       assert html =~ "Listing Varietals"
       assert html =~ varietal.name
     end
 
     test "saves new varietal", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/varietals")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/varietals")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Varietal")
                |> render_click()
-               |> follow_redirect(conn, ~p"/varietals/new")
+               |> follow_redirect(conn, ~p"/admin/varietals/new")
 
       assert render(form_live) =~ "New Varietal"
 
@@ -42,7 +42,7 @@ defmodule PourWeb.VarietalLiveTest do
                form_live
                |> form("#varietal-form", varietal: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/varietals")
+               |> follow_redirect(conn, ~p"/admin/varietals")
 
       html = render(index_live)
       assert html =~ "Varietal created successfully"
@@ -50,13 +50,13 @@ defmodule PourWeb.VarietalLiveTest do
     end
 
     test "updates varietal in listing", %{conn: conn, varietal: varietal} do
-      {:ok, index_live, _html} = live(conn, ~p"/varietals")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/varietals")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#varietals-#{varietal.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/varietals/#{varietal}/edit")
+               |> follow_redirect(conn, ~p"/admin/varietals/#{varietal}/edit")
 
       assert render(form_live) =~ "Edit Varietal"
 
@@ -68,7 +68,7 @@ defmodule PourWeb.VarietalLiveTest do
                form_live
                |> form("#varietal-form", varietal: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/varietals")
+               |> follow_redirect(conn, ~p"/admin/varietals")
 
       html = render(index_live)
       assert html =~ "Varietal updated successfully"
@@ -76,7 +76,7 @@ defmodule PourWeb.VarietalLiveTest do
     end
 
     test "deletes varietal in listing", %{conn: conn, varietal: varietal} do
-      {:ok, index_live, _html} = live(conn, ~p"/varietals")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/varietals")
 
       assert index_live |> element("#varietals-#{varietal.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#varietals-#{varietal.id}")
@@ -84,23 +84,23 @@ defmodule PourWeb.VarietalLiveTest do
   end
 
   describe "Show" do
-    setup [:create_varietal]
+    setup [:register_and_log_in_admin, :create_varietal]
 
     test "displays varietal", %{conn: conn, varietal: varietal} do
-      {:ok, _show_live, html} = live(conn, ~p"/varietals/#{varietal}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/varietals/#{varietal}")
 
       assert html =~ "Show Varietal"
       assert html =~ varietal.name
     end
 
     test "updates varietal and returns to show", %{conn: conn, varietal: varietal} do
-      {:ok, show_live, _html} = live(conn, ~p"/varietals/#{varietal}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/varietals/#{varietal}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/varietals/#{varietal}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/admin/varietals/#{varietal}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Varietal"
 
@@ -112,7 +112,7 @@ defmodule PourWeb.VarietalLiveTest do
                form_live
                |> form("#varietal-form", varietal: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/varietals/#{varietal}")
+               |> follow_redirect(conn, ~p"/admin/varietals/#{varietal}")
 
       html = render(show_live)
       assert html =~ "Varietal updated successfully"

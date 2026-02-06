@@ -10,6 +10,23 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
+# Create admin user if none exists
+alias Pour.Repo
+alias Pour.Accounts.User
+
+unless Repo.get_by(User, email: "admin@georgetownpour.com") do
+  %User{}
+  |> Ecto.Changeset.change(%{
+    email: "admin@georgetownpour.com",
+    hashed_password: Bcrypt.hash_pwd_salt("AdminPassword123!"),
+    role: "admin",
+    approved: true,
+    approved_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    confirmed_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  })
+  |> Repo.insert!()
+end
+
 region_data = %{
   "Africa" => %{
     "Algeria" => [

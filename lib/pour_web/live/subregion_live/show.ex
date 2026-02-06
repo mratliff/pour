@@ -11,10 +11,13 @@ defmodule PourWeb.SubregionLive.Show do
         Subregion {@subregion.id}
         <:subtitle>This is a subregion record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/subregions"}>
+          <.button navigate={~p"/admin/subregions"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/subregions/#{@subregion}/edit?return_to=show"}>
+          <.button
+            variant="primary"
+            navigate={~p"/admin/subregions/#{@subregion}/edit?return_to=show"}
+          >
             <.icon name="hero-pencil-square" /> Edit subregion
           </.button>
         </:actions>

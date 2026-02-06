@@ -14,23 +14,23 @@ defmodule PourWeb.CountryLiveTest do
   end
 
   describe "Index" do
-    setup [:create_country]
+    setup [:register_and_log_in_admin, :create_country]
 
     test "lists all countries", %{conn: conn, country: country} do
-      {:ok, _index_live, html} = live(conn, ~p"/countries")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/countries")
 
       assert html =~ "Listing Countries"
       assert html =~ country.name
     end
 
     test "saves new country", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/countries")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/countries")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Country")
                |> render_click()
-               |> follow_redirect(conn, ~p"/countries/new")
+               |> follow_redirect(conn, ~p"/admin/countries/new")
 
       assert render(form_live) =~ "New Country"
 
@@ -42,7 +42,7 @@ defmodule PourWeb.CountryLiveTest do
                form_live
                |> form("#country-form", country: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/countries")
+               |> follow_redirect(conn, ~p"/admin/countries")
 
       html = render(index_live)
       assert html =~ "Country created successfully"
@@ -50,13 +50,13 @@ defmodule PourWeb.CountryLiveTest do
     end
 
     test "updates country in listing", %{conn: conn, country: country} do
-      {:ok, index_live, _html} = live(conn, ~p"/countries")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/countries")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#countries-#{country.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/countries/#{country}/edit")
+               |> follow_redirect(conn, ~p"/admin/countries/#{country}/edit")
 
       assert render(form_live) =~ "Edit Country"
 
@@ -68,7 +68,7 @@ defmodule PourWeb.CountryLiveTest do
                form_live
                |> form("#country-form", country: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/countries")
+               |> follow_redirect(conn, ~p"/admin/countries")
 
       html = render(index_live)
       assert html =~ "Country updated successfully"
@@ -76,7 +76,7 @@ defmodule PourWeb.CountryLiveTest do
     end
 
     test "deletes country in listing", %{conn: conn, country: country} do
-      {:ok, index_live, _html} = live(conn, ~p"/countries")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/countries")
 
       assert index_live |> element("#countries-#{country.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#countries-#{country.id}")
@@ -84,23 +84,23 @@ defmodule PourWeb.CountryLiveTest do
   end
 
   describe "Show" do
-    setup [:create_country]
+    setup [:register_and_log_in_admin, :create_country]
 
     test "displays country", %{conn: conn, country: country} do
-      {:ok, _show_live, html} = live(conn, ~p"/countries/#{country}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/countries/#{country}")
 
       assert html =~ "Show Country"
       assert html =~ country.name
     end
 
     test "updates country and returns to show", %{conn: conn, country: country} do
-      {:ok, show_live, _html} = live(conn, ~p"/countries/#{country}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/countries/#{country}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/countries/#{country}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/admin/countries/#{country}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Country"
 
@@ -112,7 +112,7 @@ defmodule PourWeb.CountryLiveTest do
                form_live
                |> form("#country-form", country: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/countries/#{country}")
+               |> follow_redirect(conn, ~p"/admin/countries/#{country}")
 
       html = render(show_live)
       assert html =~ "Country updated successfully"

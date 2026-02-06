@@ -9,8 +9,7 @@ defmodule PourWeb.WineLiveTest do
     name: "some updated name",
     description: "some updated description",
     price: 100,
-    local_price: 100,
-    vintage_id: 1
+    local_price: 100
   }
   @invalid_attrs %{name: nil, description: nil}
   defp create_wine(_) do
@@ -20,23 +19,23 @@ defmodule PourWeb.WineLiveTest do
   end
 
   describe "Index" do
-    setup [:create_wine]
+    setup [:register_and_log_in_admin, :create_wine]
 
     test "lists all wines", %{conn: conn, wine: wine} do
-      {:ok, _index_live, html} = live(conn, ~p"/wines")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/wines")
 
       assert html =~ "Listing Wines"
       assert html =~ wine.name
     end
 
     test "saves new wine", %{conn: conn, wine: wine} do
-      {:ok, index_live, _html} = live(conn, ~p"/wines")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/wines")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Wine")
                |> render_click()
-               |> follow_redirect(conn, ~p"/wines/new")
+               |> follow_redirect(conn, ~p"/admin/wines/new")
 
       assert render(form_live) =~ "New Wine"
 
@@ -49,6 +48,7 @@ defmodule PourWeb.WineLiveTest do
         |> Map.put(:country_id, wine.country_id)
         |> Map.put(:region_id, wine.region_id)
         |> Map.put(:sub_region_id, wine.sub_region_id)
+        |> Map.put(:vintage_id, wine.vintage_id)
 
       assert {:ok, index_live, _html} =
                form_live
@@ -56,7 +56,7 @@ defmodule PourWeb.WineLiveTest do
                  wine: attrs
                )
                |> render_submit()
-               |> follow_redirect(conn, ~p"/wines")
+               |> follow_redirect(conn, ~p"/admin/wines")
 
       html = render(index_live)
       assert html =~ "Wine created successfully"
@@ -64,13 +64,13 @@ defmodule PourWeb.WineLiveTest do
     end
 
     test "updates wine in listing", %{conn: conn, wine: wine} do
-      {:ok, index_live, _html} = live(conn, ~p"/wines")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/wines")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#wines-#{wine.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/wines/#{wine}/edit")
+               |> follow_redirect(conn, ~p"/admin/wines/#{wine}/edit")
 
       assert render(form_live) =~ "Edit Wine"
 
@@ -82,7 +82,7 @@ defmodule PourWeb.WineLiveTest do
                form_live
                |> form("#wine-form", wine: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/wines")
+               |> follow_redirect(conn, ~p"/admin/wines")
 
       html = render(index_live)
       assert html =~ "Wine updated successfully"
@@ -90,7 +90,7 @@ defmodule PourWeb.WineLiveTest do
     end
 
     test "deletes wine in listing", %{conn: conn, wine: wine} do
-      {:ok, index_live, _html} = live(conn, ~p"/wines")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/wines")
 
       assert index_live |> element("#wines-#{wine.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#wines-#{wine.id}")
@@ -98,23 +98,23 @@ defmodule PourWeb.WineLiveTest do
   end
 
   describe "Show" do
-    setup [:create_wine]
+    setup [:register_and_log_in_admin, :create_wine]
 
     test "displays wine", %{conn: conn, wine: wine} do
-      {:ok, _show_live, html} = live(conn, ~p"/wines/#{wine}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/wines/#{wine}")
 
       assert html =~ "Show Wine"
       assert html =~ wine.name
     end
 
     test "updates wine and returns to show", %{conn: conn, wine: wine} do
-      {:ok, show_live, _html} = live(conn, ~p"/wines/#{wine}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/wines/#{wine}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/wines/#{wine}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/admin/wines/#{wine}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Wine"
 
@@ -127,6 +127,7 @@ defmodule PourWeb.WineLiveTest do
         |> Map.put(:country_id, wine.country_id)
         |> Map.put(:region_id, wine.region_id)
         |> Map.put(:sub_region_id, wine.sub_region_id)
+        |> Map.put(:vintage_id, wine.vintage_id)
 
       assert {:ok, show_live, _html} =
                form_live
@@ -134,7 +135,7 @@ defmodule PourWeb.WineLiveTest do
                  wine: attrs
                )
                |> render_submit()
-               |> follow_redirect(conn, ~p"/wines/#{wine}")
+               |> follow_redirect(conn, ~p"/admin/wines/#{wine}")
 
       html = render(show_live)
       assert html =~ "Wine updated successfully"

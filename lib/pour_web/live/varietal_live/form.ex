@@ -89,6 +89,6 @@ defmodule PourWeb.VarietalLive.Form do
     end
   end
 
-  defp return_path("index", _varietal), do: ~p"/varietals"
-  defp return_path("show", varietal), do: ~p"/varietals/#{varietal}"
+  defp return_path("index", _varietal), do: ~p"/admin/varietals"
+  defp return_path("show", varietal), do: ~p"/admin/varietals/#{varietal}"
 end

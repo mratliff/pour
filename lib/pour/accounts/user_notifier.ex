@@ -19,6 +19,24 @@ defmodule Pour.Accounts.UserNotifier do
   end
 
   @doc """
+  Deliver notification that a user's account has been approved.
+  """
+  def deliver_approval_notification(user) do
+    deliver(user.email, "Your Georgetown Pour account has been approved!", """
+
+    ==============================
+
+    Hi #{user.email},
+
+    Great news! Your Georgetown Pour account has been approved.
+
+    You can now log in and browse our wine selection.
+
+    ==============================
+    """)
+  end
+
+  @doc """
   Deliver instructions to update a user email.
   """
   def deliver_update_email_instructions(user, url) do

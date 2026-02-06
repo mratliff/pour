@@ -42,7 +42,46 @@ defmodule Pour.ShoppingCart do
 
   """
   def list_carts(%Scope{} = scope) do
-    Repo.all(from cart in Cart, where: cart.user_id == ^scope.user.id)
+    Repo.all(
+      from(c in Cart,
+        where: c.user_id == ^scope.user.id,
+        left_join: i in assoc(c, :items),
+        left_join: w in assoc(i, :wine),
+        order_by: [asc: i.inserted_at],
+        preload: [items: {i, wine: w}]
+      )
+    )
+  end
+
+  def count_cart_items(%Cart{} = cart) do
+    Enum.reduce(cart.items, 0, fn item, acc -> acc + item.quantity end)
+  end
+
+  @doc """
+  Gets a single cart by scope and id.
+
+  Raises `Ecto.NoResultsError` if the cart does not exist or
+  does not belong to the given scope.
+
+  ## Examples
+
+      iex> get_cart!(scope, 123)
+      %Cart{}
+
+      iex> get_cart!(scope, 456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_cart!(%Scope{} = scope, id) do
+    Repo.one!(
+      from(c in Cart,
+        where: c.id == ^id and c.user_id == ^scope.user.id,
+        left_join: i in assoc(c, :items),
+        left_join: w in assoc(i, :wine),
+        order_by: [asc: i.inserted_at],
+        preload: [items: {i, wine: w}]
+      )
+    )
   end
 
   def get_cart(%Scope{} = scope) do

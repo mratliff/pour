@@ -10,7 +10,7 @@ defmodule PourWeb.VarietalLive.Index do
       <.header>
         Listing Varietals
         <:actions>
-          <.button variant="primary" navigate={~p"/varietals/new"}>
+          <.button variant="primary" navigate={~p"/admin/varietals/new"}>
             <.icon name="hero-plus" /> New Varietal
           </.button>
         </:actions>
@@ -19,14 +19,14 @@ defmodule PourWeb.VarietalLive.Index do
       <.table
         id="varietals"
         rows={@streams.varietals}
-        row_click={fn {_id, varietal} -> JS.navigate(~p"/varietals/#{varietal}") end}
+        row_click={fn {_id, varietal} -> JS.navigate(~p"/admin/varietals/#{varietal}") end}
       >
         <:col :let={{_id, varietal}} label="Name">{varietal.name}</:col>
         <:action :let={{_id, varietal}}>
           <div class="sr-only">
-            <.link navigate={~p"/varietals/#{varietal}"}>Show</.link>
+            <.link navigate={~p"/admin/varietals/#{varietal}"}>Show</.link>
           </div>
-          <.link navigate={~p"/varietals/#{varietal}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/varietals/#{varietal}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, varietal}}>
           <.link

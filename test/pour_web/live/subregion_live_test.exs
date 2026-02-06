@@ -20,23 +20,23 @@ defmodule PourWeb.SubregionLiveTest do
   end
 
   describe "Index" do
-    setup [:create_subregion, :create_region]
+    setup [:register_and_log_in_admin, :create_subregion, :create_region]
 
     test "lists all subregions", %{conn: conn, subregion: subregion} do
-      {:ok, _index_live, html} = live(conn, ~p"/subregions")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/subregions")
 
       assert html =~ "Listing Subregions"
       assert html =~ subregion.name
     end
 
     test "saves new subregion", %{conn: conn, region: region} do
-      {:ok, index_live, _html} = live(conn, ~p"/subregions")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/subregions")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Subregion")
                |> render_click()
-               |> follow_redirect(conn, ~p"/subregions/new")
+               |> follow_redirect(conn, ~p"/admin/subregions/new")
 
       assert render(form_live) =~ "New Subregion"
 
@@ -50,7 +50,7 @@ defmodule PourWeb.SubregionLiveTest do
                  subregion: Map.put(@create_attrs, :region_id, region.id)
                )
                |> render_submit()
-               |> follow_redirect(conn, ~p"/subregions")
+               |> follow_redirect(conn, ~p"/admin/subregions")
 
       html = render(index_live)
       assert html =~ "Subregion created successfully"
@@ -58,13 +58,13 @@ defmodule PourWeb.SubregionLiveTest do
     end
 
     test "updates subregion in listing", %{conn: conn, subregion: subregion} do
-      {:ok, index_live, _html} = live(conn, ~p"/subregions")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/subregions")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#subregions-#{subregion.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/subregions/#{subregion}/edit")
+               |> follow_redirect(conn, ~p"/admin/subregions/#{subregion}/edit")
 
       assert render(form_live) =~ "Edit Subregion"
 
@@ -76,7 +76,7 @@ defmodule PourWeb.SubregionLiveTest do
                form_live
                |> form("#subregion-form", subregion: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/subregions")
+               |> follow_redirect(conn, ~p"/admin/subregions")
 
       html = render(index_live)
       assert html =~ "Subregion updated successfully"
@@ -84,7 +84,7 @@ defmodule PourWeb.SubregionLiveTest do
     end
 
     test "deletes subregion in listing", %{conn: conn, subregion: subregion} do
-      {:ok, index_live, _html} = live(conn, ~p"/subregions")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/subregions")
 
       assert index_live |> element("#subregions-#{subregion.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#subregions-#{subregion.id}")
@@ -92,23 +92,23 @@ defmodule PourWeb.SubregionLiveTest do
   end
 
   describe "Show" do
-    setup [:create_subregion]
+    setup [:register_and_log_in_admin, :create_subregion]
 
     test "displays subregion", %{conn: conn, subregion: subregion} do
-      {:ok, _show_live, html} = live(conn, ~p"/subregions/#{subregion}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/subregions/#{subregion}")
 
       assert html =~ "Show Subregion"
       assert html =~ subregion.name
     end
 
     test "updates subregion and returns to show", %{conn: conn, subregion: subregion} do
-      {:ok, show_live, _html} = live(conn, ~p"/subregions/#{subregion}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/subregions/#{subregion}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/subregions/#{subregion}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/admin/subregions/#{subregion}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Subregion"
 
@@ -120,7 +120,7 @@ defmodule PourWeb.SubregionLiveTest do
                form_live
                |> form("#subregion-form", subregion: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/subregions/#{subregion}")
+               |> follow_redirect(conn, ~p"/admin/subregions/#{subregion}")
 
       html = render(show_live)
       assert html =~ "Subregion updated successfully"

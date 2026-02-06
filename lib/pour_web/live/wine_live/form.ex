@@ -3,7 +3,7 @@ defmodule PourWeb.WineLive.Form do
 
   alias Pour.Catalog
   alias Pour.Catalog.Wine
-
+  alias Pour.Varietals
   @impl true
   def render(assigns) do
     ~H"""
@@ -24,6 +24,57 @@ defmodule PourWeb.WineLive.Form do
         <.input field={@form[:country_id]} type="select" label="Country" options={@countries} />
         <.input field={@form[:region_id]} type="select" label="Region" options={@regions} />
         <.input field={@form[:sub_region_id]} type="select" label="Sub Region" options={@sub_regions} />
+        <div class="grid grid-cols-2">
+          <div class="">
+            Selected Varietals
+            <div class="h-[335px] overflow-auto border-b">
+              <.inputs_for :let={fc} field={@form[:wine_varietals]}>
+                <div class="flex justify-between">
+                  <div class="self-center flex-initial index-text w-3/4">
+                    <div class="flex flex-col">
+                      {Phoenix.HTML.Form.input_value(fc, :name)}
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="wine[wine_varietals_delete][]"
+                        value={fc.index}
+                        class="hidden"
+                      />
+                      <.icon name="hero-x-mark" class="bg-red-500 w-5 h-5" />
+                    </label>
+                  </div>
+                  <input type="hidden" name={fc[:wine_id].name} value={fc[:wine_id].value} />
+                </div>
+              </.inputs_for>
+            </div>
+          </div>
+          <div class="">
+            Varietals
+            <div class="h-[535px] overflow-auto border-b">
+              <%= for varietal <- @varietals do %>
+                <div class="flex flex-row justify-between mb-1 mt-1">
+                  <div class="flex ml-2">
+                    {varietal.name}
+                  </div>
+                  <div class="flex">
+                    <label class="block cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="wine[varietal_order][]"
+                        class="hidden"
+                        value={varietal.id}
+                      />
+                      <.icon name="hero-plus-circle" />
+                    </label>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Wine</.button>
           <.button navigate={return_path(@return_to, @wine)}>Cancel</.button>
@@ -48,6 +99,7 @@ defmodule PourWeb.WineLive.Form do
      |> assign(:regions, regions)
      |> assign(:sub_regions, sub_regions)
      |> assign(:countries, countries)
+     |> assign(:varietals, Varietals.list_varietals())
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -117,8 +169,8 @@ defmodule PourWeb.WineLive.Form do
     end
   end
 
-  defp return_path("index", _wine), do: ~p"/wines"
-  defp return_path("show", wine), do: ~p"/wines/#{wine}"
+  defp return_path("index", _wine), do: ~p"/admin/wines"
+  defp return_path("show", wine), do: ~p"/admin/wines/#{wine}"
 
   defp load_regions(%{"region_id" => region_id, "country_id" => country_id}) do
     regions = list_select_for(Pour.WineRegions.list_regions(country_id))

@@ -57,6 +57,7 @@ defmodule PourWeb.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class="toast toast-top toast-end z-50"
+      phx-hook="AutoClearFlash"
       {@rest}
     >
       <div class={[
@@ -192,6 +193,27 @@ defmodule PourWeb.CoreComponents do
             {@rest}
           />{@label}
         </span>
+      </label>
+      <.error :for={msg <- @errors}>{msg}</.error>
+    </fieldset>
+    """
+  end
+
+  def input(%{type: "select", multiple: true} = assigns) do
+    ~H"""
+    <fieldset class="fieldset mb-2">
+      <label>
+        <span :if={@label} class="fieldset-label mb-1">{@label}</span>
+        <select
+          id={@id}
+          name={@name}
+          class={["w-full h-64 select", @errors != [] && "select-error"]}
+          multiple={@multiple}
+          {@rest}
+        >
+          <option :if={@prompt} value="">{@prompt}</option>
+          {Phoenix.HTML.Form.options_for_select(@options, @value)}
+        </select>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </fieldset>

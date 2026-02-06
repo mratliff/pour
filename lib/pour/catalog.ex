@@ -41,7 +41,7 @@ defmodule Pour.Catalog do
       ** (Ecto.NoResultsError)
 
   """
-  def get_wine!(id), do: Repo.get!(Wine, id)
+  def get_wine!(id), do: Repo.get!(Wine, id) |> Repo.preload(:wine_varietals)
 
   @doc """
   Creates a wine.
@@ -59,6 +59,10 @@ defmodule Pour.Catalog do
     %Wine{}
     |> Wine.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, wine} -> {:ok, Repo.preload(wine, :wine_varietals)}
+      error -> error
+    end
   end
 
   @doc """
@@ -77,6 +81,10 @@ defmodule Pour.Catalog do
     wine
     |> Wine.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, wine} -> {:ok, Repo.preload(wine, :wine_varietals)}
+      error -> error
+    end
   end
 
   @doc """

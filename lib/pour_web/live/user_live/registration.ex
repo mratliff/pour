@@ -40,7 +40,7 @@ defmodule PourWeb.UserLive.Registration do
 
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
       when not is_nil(user) do
-    {:ok, redirect(socket, to: PourWeb.UserAuth.signed_in_path(socket))}
+    {:ok, redirect(socket, to: PourWeb.UserAuth.signed_in_path(user))}
   end
 
   def mount(_params, _session, socket) do

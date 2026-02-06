@@ -9,6 +9,9 @@ defmodule Pour.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :role, :string, default: "member"
+    field :approved, :boolean, default: false
+    field :approved_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end
@@ -105,6 +108,34 @@ defmodule Pour.Accounts.User do
     else
       changeset
     end
+  end
+
+  @doc """
+  A changeset for approving or unapproving a user.
+  Sets `approved_at` when `approved` becomes true.
+  """
+  def approval_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:approved])
+    |> maybe_set_approved_at()
+  end
+
+  defp maybe_set_approved_at(changeset) do
+    if get_change(changeset, :approved) == true do
+      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      put_change(changeset, :approved_at, now)
+    else
+      changeset
+    end
+  end
+
+  @doc """
+  A changeset for updating a user's role.
+  """
+  def role_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:role])
+    |> validate_inclusion(:role, ~w(admin member shop))
   end
 
   @doc """

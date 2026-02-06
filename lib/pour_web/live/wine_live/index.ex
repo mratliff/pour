@@ -10,7 +10,7 @@ defmodule PourWeb.WineLive.Index do
       <.header>
         Listing Wines
         <:actions>
-          <.button variant="primary" navigate={~p"/wines/new"}>
+          <.button variant="primary" navigate={~p"/admin/wines/new"}>
             <.icon name="hero-plus" /> New Wine
           </.button>
         </:actions>
@@ -19,15 +19,15 @@ defmodule PourWeb.WineLive.Index do
       <.table
         id="wines"
         rows={@streams.wines}
-        row_click={fn {_id, wine} -> JS.navigate(~p"/wines/#{wine}") end}
+        row_click={fn {_id, wine} -> JS.navigate(~p"/admin/wines/#{wine}") end}
       >
         <:col :let={{_id, wine}} label="Name">{wine.name}</:col>
         <:col :let={{_id, wine}} label="Description">{wine.description}</:col>
         <:action :let={{_id, wine}}>
           <div class="sr-only">
-            <.link navigate={~p"/wines/#{wine}"}>Show</.link>
+            <.link navigate={~p"/admin/wines/#{wine}"}>Show</.link>
           </div>
-          <.link navigate={~p"/wines/#{wine}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/wines/#{wine}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, wine}}>
           <.link

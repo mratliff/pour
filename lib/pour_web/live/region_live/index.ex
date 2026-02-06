@@ -10,7 +10,7 @@ defmodule PourWeb.RegionLive.Index do
       <.header>
         Listing Regions
         <:actions>
-          <.button variant="primary" navigate={~p"/regions/new"}>
+          <.button variant="primary" navigate={~p"/admin/regions/new"}>
             <.icon name="hero-plus" /> New Region
           </.button>
         </:actions>
@@ -19,15 +19,15 @@ defmodule PourWeb.RegionLive.Index do
       <.table
         id="regions"
         rows={@streams.regions}
-        row_click={fn {_id, region} -> JS.navigate(~p"/regions/#{region}") end}
+        row_click={fn {_id, region} -> JS.navigate(~p"/admin/regions/#{region}") end}
       >
         <:col :let={{_id, region}} label="Name">{region.name}</:col>
         <:col :let={{_id, region}} label="Country">{region.country.name}</:col>
         <:action :let={{_id, region}}>
           <div class="sr-only">
-            <.link navigate={~p"/regions/#{region}"}>Show</.link>
+            <.link navigate={~p"/admin/regions/#{region}"}>Show</.link>
           </div>
-          <.link navigate={~p"/regions/#{region}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/regions/#{region}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, region}}>
           <.link

@@ -37,6 +37,15 @@ defmodule Pour.AccountsFixtures do
 
     {:ok, user, _expired_tokens} = Accounts.login_user_by_magic_link(token)
 
+    # Approve the user by default so existing tests work
+    {:ok, user} = Accounts.approve_user(user)
+
+    user
+  end
+
+  def admin_fixture(attrs \\ %{}) do
+    user = user_fixture(attrs)
+    {:ok, user} = Accounts.update_user_role(user, "admin")
     user
   end
 

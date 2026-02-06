@@ -11,10 +11,10 @@ defmodule PourWeb.RegionLive.Show do
         Region {@region.id}
         <:subtitle>This is a region record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/regions"}>
+          <.button navigate={~p"/admin/regions"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/regions/#{@region}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/regions/#{@region}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit region
           </.button>
         </:actions>

@@ -11,10 +11,10 @@ defmodule PourWeb.VarietalLive.Show do
         Varietal {@varietal.id}
         <:subtitle>This is a varietal record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/varietals"}>
+          <.button navigate={~p"/admin/varietals"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/varietals/#{@varietal}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/varietals/#{@varietal}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit varietal
           </.button>
         </:actions>

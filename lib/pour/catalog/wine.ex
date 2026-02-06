@@ -5,6 +5,7 @@ defmodule Pour.Catalog.Wine do
   alias Pour.WineRegions.Region
   alias Pour.WineRegions.Subregion
   alias Pour.WineRegions.Country
+  alias Pour.Catalog.WineVarietals
 
   schema "wines" do
     field :name, :string
@@ -17,6 +18,7 @@ defmodule Pour.Catalog.Wine do
     belongs_to :region, Region
     belongs_to :sub_region, Subregion
     belongs_to :country, Country
+    has_many :wine_varietals, WineVarietals
     timestamps(type: :utc_datetime)
   end
 
@@ -47,5 +49,6 @@ defmodule Pour.Catalog.Wine do
       :region_id,
       :country_id
     ])
+    |> cast_assoc(:wine_varietals, sort_param: :varietal_order, drop_param: :varietal_delete)
   end
 end

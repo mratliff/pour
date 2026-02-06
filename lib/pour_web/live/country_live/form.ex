@@ -89,6 +89,6 @@ defmodule PourWeb.CountryLive.Form do
     end
   end
 
-  defp return_path("index", _country), do: ~p"/countries"
-  defp return_path("show", country), do: ~p"/countries/#{country}"
+  defp return_path("index", _country), do: ~p"/admin/countries"
+  defp return_path("show", country), do: ~p"/admin/countries/#{country}"
 end

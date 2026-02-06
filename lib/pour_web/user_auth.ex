@@ -38,7 +38,7 @@ defmodule PourWeb.UserAuth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params, remember_me)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: user_return_to || signed_in_path(user))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}, _),
@@ -172,6 +172,53 @@ defmodule PourWeb.UserAuth do
     end
   end
 
+  def on_mount(:require_approved, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.approved do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.redirect(to: ~p"/pending-approval")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:require_admin, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.role == "admin" do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "Not authorized")
+        |> Phoenix.LiveView.redirect(to: ~p"/")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:require_shop, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.role == "shop" do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "Not authorized")
+        |> Phoenix.LiveView.redirect(to: ~p"/")
+
+      {:halt, socket}
+    end
+  end
+
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
@@ -228,6 +275,37 @@ defmodule PourWeb.UserAuth do
     end
   end
 
+  @doc """
+  Requires the user to be approved.
+  Redirects to /pending-approval if not.
+  """
+  def require_approved_user(conn, _opts) do
+    if conn.assigns.current_scope && conn.assigns.current_scope.user &&
+         conn.assigns.current_scope.user.approved do
+      conn
+    else
+      conn
+      |> redirect(to: ~p"/pending-approval")
+      |> halt()
+    end
+  end
+
+  @doc """
+  Requires the user to have the admin role.
+  Redirects to / with flash if not.
+  """
+  def require_admin_user(conn, _opts) do
+    if conn.assigns.current_scope && conn.assigns.current_scope.user &&
+         conn.assigns.current_scope.user.role == "admin" do
+      conn
+    else
+      conn
+      |> put_flash(:error, "Not authorized")
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)
@@ -252,10 +330,8 @@ defmodule PourWeb.UserAuth do
   defp maybe_store_return_to(conn), do: conn
 
   @doc "Returns the path to redirect to after log in."
-  # the user was already logged in, redirect to settings
-  def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
-    ~p"/users/settings"
-  end
-
+  def signed_in_path(%Accounts.User{approved: false}), do: ~p"/pending-approval"
+  def signed_in_path(%Accounts.User{role: "admin"}), do: ~p"/admin/users"
+  def signed_in_path(%Accounts.User{}), do: ~p"/lot"
   def signed_in_path(_), do: ~p"/"
 end

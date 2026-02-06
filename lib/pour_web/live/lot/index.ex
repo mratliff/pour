@@ -15,13 +15,13 @@ defmodule PourWeb.LotLive.Index do
       <.table
         id="wines"
         rows={@streams.wines}
-        row_click={fn {_id, wine} -> JS.navigate(~p"/wines/#{wine}") end}
+        row_click={fn {_id, wine} -> JS.navigate(~p"/admin/wines/#{wine}") end}
       >
         <:col :let={{_id, wine}} label="Name">{wine.name}</:col>
         <:col :let={{_id, wine}} label="Description">{wine.description}</:col>
         <:action :let={{_id, wine}}>
           <div class="sr-only">
-            <.link navigate={~p"/wines/#{wine}"}>Show</.link>
+            <.link navigate={~p"/admin/wines/#{wine}"}>Show</.link>
           </div>
         </:action>
         <:action :let={{_id, wine}}>
@@ -44,9 +44,15 @@ defmodule PourWeb.LotLive.Index do
 
   @impl true
   def handle_event("add-to-cart", %{"wine-id" => id}, socket) do
+    IO.inspect(id)
     wine = Catalog.get_wine!(id)
-    cart = ShoppingCart.add_item_to_cart(socket.assigns.current_scope, socket.assigns.cart, wine)
 
-    {:noreply, socket |> assign(:cart, cart) |> put_flash(:info, "#{wine.name} added to cart")}
+    {:ok, _cart_item} =
+      ShoppingCart.add_item_to_cart(socket.assigns.current_scope, socket.assigns.cart, wine)
+
+    cart = ShoppingCart.get_cart(socket.assigns.current_scope)
+
+    {:noreply,
+     socket |> assign(:cart, cart) |> put_flash(:info, "#{wine.name} added to your cart")}
   end
 end

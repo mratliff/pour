@@ -60,6 +60,65 @@ defmodule Pour.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  ## User management
+
+  @doc """
+  Returns all users ordered by inserted_at desc.
+  """
+  def list_users do
+    User |> order_by(desc: :inserted_at) |> Repo.all()
+  end
+
+  @doc """
+  Returns users where approved == false, ordered by inserted_at.
+  """
+  def list_pending_users do
+    User |> where([u], u.approved == false) |> order_by(:inserted_at) |> Repo.all()
+  end
+
+  @doc """
+  Approves a user by setting approved to true and approved_at to now.
+  Sends an approval notification email.
+  """
+  def approve_user(%User{} = user) do
+    user
+    |> User.approval_changeset(%{approved: true})
+    |> Repo.update()
+    |> case do
+      {:ok, user} ->
+        UserNotifier.deliver_approval_notification(user)
+        {:ok, user}
+
+      error ->
+        error
+    end
+  end
+
+  @doc """
+  Rejects a user by deleting them and their tokens.
+  """
+  def reject_user(%User{} = user) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, :all))
+    |> Ecto.Multi.delete(:user, user)
+    |> Repo.transaction()
+  end
+
+  @doc """
+  Updates a user's role.
+  """
+  def update_user_role(%User{} = user, role) do
+    user
+    |> User.role_changeset(%{role: role})
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns whether a user is approved.
+  """
+  def user_approved?(%User{approved: approved}), do: approved
+  def user_approved?(_), do: false
+
   ## User registration
 
   @doc """
