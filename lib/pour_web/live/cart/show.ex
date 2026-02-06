@@ -64,7 +64,7 @@ defmodule PourWeb.CartLive.Show do
         <div class="">
           <h3 class="text-sm">
             <a
-              href={~p"/admin/wines/#{@item.wine.id}"}
+              href={~p"/wines/#{@item.wine.id}"}
               class="font-medium text-gray-400 hover:text-gray-200"
             >
               {@item.wine.name}

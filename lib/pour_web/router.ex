@@ -23,7 +23,12 @@ defmodule PourWeb.Router do
   scope "/", PourWeb do
     pipe_through :browser
 
-    live "/", HomeLive.Index, :index
+    live_session :public,
+      on_mount: [{PourWeb.UserAuth, :mount_current_scope}] do
+      live "/", HomeLive.Index, :index
+      live "/lot", LotLive.Index, :index
+      live "/wines/:id", WineLive.MemberShow, :show
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -97,7 +102,6 @@ defmodule PourWeb.Router do
         {PourWeb.UserAuth, :require_approved},
         {PourWeb.UserAuth, :load_cart}
       ] do
-      live "/lot", LotLive.Index, :index
       live "/cart", CartLive.Show, :show
     end
   end
