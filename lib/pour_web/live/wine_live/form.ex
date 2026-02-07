@@ -20,6 +20,38 @@ defmodule PourWeb.WineLive.Form do
         <.input field={@form[:local_price]} type="number" label="Local Price" />
         <.input field={@form[:available]} type="checkbox" label="Available?" />
 
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Wine Image</label>
+          <div :if={@wine.image_url && @uploads.wine_image.entries == []} class="mb-2">
+            <img
+              src={@wine.image_url}
+              alt="Current wine image"
+              class="h-32 w-32 object-cover rounded"
+            />
+          </div>
+          <.live_file_input upload={@uploads.wine_image} />
+          <div :for={entry <- @uploads.wine_image.entries} class="mt-2">
+            <.live_img_preview entry={entry} class="h-32 w-32 object-cover rounded" />
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-sm text-gray-600">{entry.client_name}</span>
+              <button
+                type="button"
+                phx-click="cancel_upload"
+                phx-value-ref={entry.ref}
+                class="text-red-600 text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+            <p :for={err <- upload_errors(@uploads.wine_image, entry)} class="text-red-600 text-sm">
+              {upload_error_to_string(err)}
+            </p>
+          </div>
+          <p :for={err <- upload_errors(@uploads.wine_image)} class="text-red-600 text-sm">
+            {upload_error_to_string(err)}
+          </p>
+        </div>
+
         <.input field={@form[:vintage_id]} type="select" label="Vintage" options={@vintages} />
         <.input field={@form[:country_id]} type="select" label="Country" options={@countries} />
         <.input field={@form[:region_id]} type="select" label="Region" options={@regions} />
@@ -100,6 +132,11 @@ defmodule PourWeb.WineLive.Form do
      |> assign(:sub_regions, sub_regions)
      |> assign(:countries, countries)
      |> assign(:varietals, Varietals.list_varietals())
+     |> allow_upload(:wine_image,
+       accept: ~w(.jpg .jpeg .png .webp),
+       max_entries: 1,
+       max_file_size: 5_000_000
+     )
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -140,7 +177,12 @@ defmodule PourWeb.WineLive.Form do
   end
 
   def handle_event("save", %{"wine" => wine_params}, socket) do
+    wine_params = maybe_upload_image(socket, wine_params)
     save_wine(socket, socket.assigns.live_action, wine_params)
+  end
+
+  def handle_event("cancel_upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :wine_image, ref)}
   end
 
   defp save_wine(socket, :edit, wine_params) do
@@ -177,4 +219,34 @@ defmodule PourWeb.WineLive.Form do
     sub_regions = list_select_for(Pour.WineRegions.list_subregions(region_id))
     {regions, sub_regions}
   end
+
+  defp maybe_upload_image(socket, wine_params) do
+    case uploaded_entries(socket, :wine_image) do
+      {[_entry | _] = _entries, []} ->
+        uploaded_files =
+          consume_uploaded_entries(socket, :wine_image, fn %{path: path}, entry ->
+            file_binary = File.read!(path)
+            ext = Path.extname(entry.client_name)
+            filename = "#{System.unique_integer([:positive])}#{ext}"
+
+            case Pour.Uploads.upload_to_s3(file_binary, filename) do
+              {:ok, url} -> {:ok, url}
+              {:error, _reason} -> {:postpone, nil}
+            end
+          end)
+
+        case Enum.find(uploaded_files, &(&1 != nil)) do
+          nil -> wine_params
+          url -> Map.put(wine_params, "image_url", url)
+        end
+
+      _ ->
+        wine_params
+    end
+  end
+
+  defp upload_error_to_string(:too_large), do: "File is too large (max 5MB)"
+  defp upload_error_to_string(:too_many_files), do: "Too many files"
+  defp upload_error_to_string(:not_accepted), do: "Unacceptable file type"
+  defp upload_error_to_string(err), do: "Error: #{inspect(err)}"
 end

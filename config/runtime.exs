@@ -99,6 +99,14 @@ if config_env() == :prod do
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
+  # ExAws / S3 configuration from environment
+  config :ex_aws,
+    access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
+    secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
+    region: System.get_env("AWS_REGION") || "us-east-1"
+
+  config :pour, :s3_bucket, System.get_env("S3_BUCKET") || "pour-prod"
+
   # ## Configuring the mailer
   #
   # In production you need to configure the mailer to use a different adapter.

@@ -47,7 +47,7 @@ defmodule Pour.ShoppingCartTest do
       cart = cart_fixture(scope)
       update_attrs = %{}
 
-      assert {:ok, %Cart{} = cart} = ShoppingCart.update_cart(scope, cart, update_attrs)
+      assert {:ok, %Cart{}} = ShoppingCart.update_cart(scope, cart, update_attrs)
     end
 
     test "update_cart/3 with invalid scope raises" do

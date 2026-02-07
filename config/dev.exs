@@ -85,3 +85,16 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# ExAws config for MinIO in development
+config :ex_aws,
+  access_key_id: "minioadmin",
+  secret_access_key: "minioadmin",
+  s3: [
+    scheme: "http://",
+    host: "localhost",
+    port: 9000,
+    region: "us-east-1"
+  ]
+
+config :pour, :s3_bucket, "pour-dev"

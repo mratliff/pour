@@ -92,19 +92,37 @@ defmodule PourWeb.AdminLive.Users do
   @impl true
   def handle_event("approve", %{"id" => id}, socket) do
     user = Accounts.get_user!(id)
-    {:ok, _user} = Accounts.approve_user(user)
+
+    socket =
+      case Accounts.approve_user(user) do
+        {:ok, _user} -> put_flash(socket, :info, "#{user.email} approved")
+        {:error, _} -> put_flash(socket, :error, "Failed to approve #{user.email}")
+      end
+
     {:noreply, assign(socket, :users, Accounts.list_users())}
   end
 
   def handle_event("reject", %{"id" => id}, socket) do
     user = Accounts.get_user!(id)
-    {:ok, _} = Accounts.reject_user(user)
+
+    socket =
+      case Accounts.reject_user(user) do
+        {:ok, _} -> put_flash(socket, :info, "#{user.email} rejected")
+        {:error, _} -> put_flash(socket, :error, "Failed to reject #{user.email}")
+      end
+
     {:noreply, assign(socket, :users, Accounts.list_users())}
   end
 
   def handle_event("change_role", %{"role" => role, "user-id" => id}, socket) do
     user = Accounts.get_user!(id)
-    {:ok, _user} = Accounts.update_user_role(user, role)
+
+    socket =
+      case Accounts.update_user_role(user, role) do
+        {:ok, _user} -> put_flash(socket, :info, "Role updated for #{user.email}")
+        {:error, _} -> put_flash(socket, :error, "Failed to update role for #{user.email}")
+      end
+
     {:noreply, assign(socket, :users, Accounts.list_users())}
   end
 end

@@ -113,6 +113,10 @@ defmodule Pour.Accounts do
     |> Repo.update()
   end
 
+  def list_approved_members do
+    User |> where([u], u.approved == true) |> Repo.all()
+  end
+
   @doc """
   Returns whether a user is approved.
   """
