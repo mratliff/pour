@@ -110,6 +110,24 @@ defmodule PourWeb.Router do
         {PourWeb.UserAuth, :load_cart}
       ] do
       live "/cart", CartLive.Show, :show
+      live "/orders", OrderLive.Index, :index
+      live "/orders/:id", OrderLive.Show, :show
+    end
+  end
+
+  # Shop routes (authenticated + approved + shop or admin role)
+  scope "/shop", PourWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :shop,
+      on_mount: [
+        {PourWeb.UserAuth, :require_authenticated},
+        {PourWeb.UserAuth, :require_approved},
+        {PourWeb.UserAuth, :require_shop_or_admin}
+      ] do
+      live "/orders", ShopLive.Dashboard, :index
+      live "/orders/:id", ShopLive.OrderDetail, :show
+      live "/consolidated", ShopLive.Consolidated, :index
     end
   end
 

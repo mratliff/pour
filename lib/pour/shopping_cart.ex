@@ -206,6 +206,16 @@ defmodule Pour.ShoppingCart do
     Cart.changeset(cart, attrs, scope)
   end
 
+  def cart_total(%Cart{items: items}) when is_list(items) do
+    Enum.reduce(items, Decimal.new(0), fn item, acc ->
+      Decimal.add(acc, cart_item_subtotal(item))
+    end)
+  end
+
+  def cart_item_subtotal(%CartItem{} = item) do
+    Decimal.mult(item.price_when_carted, Decimal.new(item.quantity))
+  end
+
   alias Pour.ShoppingCart.CartItem
 
   @doc """
