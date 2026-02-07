@@ -107,21 +107,24 @@ if config_env() == :prod do
 
   config :pour, :s3_bucket, System.get_env("S3_BUCKET") || "pour-prod"
 
-  # ## Configuring the mailer
-  #
-  # In production you need to configure the mailer to use a different adapter.
-  # Also, you may need to configure the Swoosh API client of your choice if you
-  # are not using SMTP. Here is an example of the configuration:
-  #
-  #     config :pour, Pour.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
-  #
-  # For this example you need include a HTTP client required by Swoosh API client.
-  # Swoosh supports Hackney, Req and Finch out of the box:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  # Mailer configuration
+  # Default: Mailgun. Alternatives commented below.
+  if System.get_env("MAILGUN_API_KEY") do
+    config :pour, Pour.Mailer,
+      adapter: Swoosh.Adapters.Mailgun,
+      api_key: System.fetch_env!("MAILGUN_API_KEY"),
+      domain: System.fetch_env!("MAILGUN_DOMAIN")
+  end
+
+  # Alternative: Postmark
+  # config :pour, Pour.Mailer,
+  #   adapter: Swoosh.Adapters.Postmark,
+  #   api_key: System.fetch_env!("POSTMARK_API_KEY")
+
+  # Alternative: AWS SES
+  # config :pour, Pour.Mailer,
+  #   adapter: Swoosh.Adapters.AmazonSES,
+  #   region: System.get_env("AWS_REGION", "us-east-1"),
+  #   access_key: System.fetch_env!("AWS_ACCESS_KEY_ID"),
+  #   secret: System.fetch_env!("AWS_SECRET_ACCESS_KEY")
 end

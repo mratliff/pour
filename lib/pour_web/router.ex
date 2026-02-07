@@ -19,6 +19,12 @@ defmodule PourWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # Health check endpoint
+  scope "/api", PourWeb do
+    pipe_through :api
+    get "/health", HealthController, :index
+  end
+
   # Public routes (no auth required)
   scope "/", PourWeb do
     pipe_through :browser
