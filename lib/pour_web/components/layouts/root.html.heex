@@ -29,6 +29,17 @@
   </head>
   <body>
     <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+      <li class="mr-auto flex gap-4">
+        <.link href={~p"/lot"} class="text-sm font-medium text-gray-700 hover:text-gray-900">
+          Wines
+        </.link>
+        <.link href={~p"/tastings"} class="text-sm font-medium text-gray-700 hover:text-gray-900">
+          Tastings
+        </.link>
+        <.link href={~p"/blog"} class="text-sm font-medium text-gray-700 hover:text-gray-900">
+          Blog
+        </.link>
+      </li>
       <%= if @current_scope do %>
         <div class="ml-4 flow-root text-sm lg:relative lg:ml-8">
           <li>

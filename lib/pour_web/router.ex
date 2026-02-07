@@ -30,6 +30,8 @@ defmodule PourWeb.Router do
       live "/wines/:id", WineLive.MemberShow, :show
       live "/tastings", TastingLive.Index, :index
       live "/tastings/:id", TastingLive.Show, :show
+      live "/blog", BlogLive.Index, :index
+      live "/blog/:slug", BlogLive.Show, :show
     end
   end
 
@@ -96,6 +98,10 @@ defmodule PourWeb.Router do
       live "/tastings/new", AdminLive.TastingLive.Form, :new
       live "/tastings/:id", AdminLive.TastingLive.Show, :show
       live "/tastings/:id/edit", AdminLive.TastingLive.Form, :edit
+
+      live "/blog", AdminLive.BlogLive.Index, :index
+      live "/blog/new", AdminLive.BlogLive.Form, :new
+      live "/blog/:id/edit", AdminLive.BlogLive.Form, :edit
     end
   end
 
