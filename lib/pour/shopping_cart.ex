@@ -90,7 +90,7 @@ defmodule Pour.ShoppingCart do
         where: c.user_id == ^scope.user.id,
         left_join: i in assoc(c, :items),
         left_join: w in assoc(i, :wine),
-        order_by: [asc: i.inserted_at],
+        order_by: [asc: w.name],
         preload: [items: {i, wine: w}]
       )
     )
@@ -129,6 +129,28 @@ defmodule Pour.ShoppingCart do
       on_conflict: [inc: [quantity: 1]],
       conflict_target: [:cart_id, :wine_id]
     )
+  end
+
+  def update_item_quantity(%Scope{} = scope, %Cart{} = cart, wine_id, quantity) do
+    true = cart.user_id == scope.user.id
+
+    item =
+      Repo.one!(
+        from(i in CartItem,
+          where: i.cart_id == ^cart.id and i.wine_id == ^wine_id
+        )
+      )
+
+    if quantity <= 0 do
+      Repo.delete(item)
+      {:ok, get_cart(scope)}
+    else
+      item
+      |> CartItem.changeset(%{quantity: quantity})
+      |> Repo.update()
+
+      {:ok, get_cart(scope)}
+    end
   end
 
   def remove_item_from_cart(%Scope{} = scope, %Cart{} = cart, wine_id) do

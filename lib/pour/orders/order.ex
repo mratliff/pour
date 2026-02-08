@@ -4,7 +4,6 @@ defmodule Pour.Orders.Order do
 
   alias Pour.Orders.OrderItem
   alias Pour.Accounts.User
-  alias Pour.Events.Tasting
 
   @statuses ~w(placed confirmed ready_for_pickup completed cancelled)
 
@@ -17,7 +16,6 @@ defmodule Pour.Orders.Order do
     field :completed_at, :utc_datetime
 
     belongs_to :user, User
-    belongs_to :tasting, Tasting
     has_many :order_items, OrderItem
     has_many :wines, through: [:order_items, :wine]
 
@@ -26,7 +24,7 @@ defmodule Pour.Orders.Order do
 
   def create_changeset(order, attrs) do
     order
-    |> cast(attrs, [:user_id, :tasting_id, :notes, :status, :placed_at])
+    |> cast(attrs, [:user_id, :notes, :status, :placed_at])
     |> validate_required([:user_id, :status, :placed_at])
     |> validate_inclusion(:status, @statuses)
   end

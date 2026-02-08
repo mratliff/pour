@@ -3,126 +3,214 @@ defmodule PourWeb.CartLive.Show do
 
   alias Pour.ShoppingCart
   alias Pour.Orders
-  alias Pour.Events
 
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <h1 class="text-3xl font-bold tracking-tight text-gray-400">Your Cart</h1>
-
-      <div :if={@cart.items == []} class="mt-12 text-center text-gray-500">
-        <p>Your cart is empty.</p>
-        <a href={~p"/lot"} class="mt-4 inline-block font-medium text-indigo-600 hover:text-indigo-500">
-          Browse wines &rarr;
-        </a>
-      </div>
-
-      <div :if={@cart.items != []} class="mt-12">
-        <h2 class="sr-only">Items in your shopping cart</h2>
-
-        <ul role="list" class="divide-y divide-gray-200 border-t border-b border-gray-200">
-          <li :for={item <- @cart.items} class="flex py-6 sm:py-10">
-            <div class="grid grid-cols-4 w-full items-center">
-              <div>
-                <h3 class="text-sm">
-                  <a
-                    href={~p"/wines/#{item.wine.id}"}
-                    class="font-medium text-gray-400 hover:text-gray-200"
-                  >
-                    {item.wine.name}
-                  </a>
-                </h3>
+    <Layouts.flash_group flash={@flash} />
+    <div class="bg-base-100">
+      <main>
+        <%!-- Hero banner --%>
+        <div class="relative bg-gray-900 py-16 sm:py-24">
+          <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div class="absolute top-[calc(50%-36rem)] left-[calc(50%-19rem)] transform-gpu blur-3xl">
+              <div
+                class="aspect-1097/1023 w-[68.5625rem] bg-linear-to-r from-[#ff4694] to-[#776fff] opacity-25"
+                style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
+              >
               </div>
-              <div class="text-center text-sm text-gray-500">
-                Qty: {item.quantity}
-              </div>
-              <div>
-                <p class="text-right text-sm font-medium text-gray-400">
-                  ${ShoppingCart.cart_item_subtotal(item)}
-                </p>
-              </div>
-              <div class="text-right">
-                <.button phx-click="remove_item" phx-value-wine-id={item.wine_id}>
-                  <span>Remove</span>
-                </.button>
-              </div>
-            </div>
-          </li>
-        </ul>
-        
-    <!-- Order summary -->
-        <div class="mt-10 sm:ml-32 sm:pl-6">
-          <div class="rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:p-8">
-            <h2 class="sr-only">Order summary</h2>
-            <div class="flow-root">
-              <dl class="-my-4 divide-y divide-gray-200 text-sm">
-                <div class="flex items-center justify-between py-4">
-                  <dt class="text-base font-medium text-gray-900">Cart total</dt>
-                  <dd class="text-base font-medium text-gray-900">
-                    ${ShoppingCart.cart_total(@cart)}
-                  </dd>
-                </div>
-              </dl>
             </div>
           </div>
-
-          <form phx-submit="place_order" class="mt-6">
-            <div :if={@tastings != []} class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">
-                Associate with tasting (optional)
-              </label>
-              <select name="tasting_id" class="mt-1 rounded-md border-gray-300 text-sm w-full">
-                <option value="">None</option>
-                <option :for={t <- @tastings} value={t.id}>{t.title}</option>
-              </select>
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Notes (optional)</label>
-              <textarea
-                name="notes"
-                rows="2"
-                class="mt-1 rounded-md border-gray-300 text-sm w-full"
-                placeholder="Any special requests..."
-              />
-            </div>
-            <.button type="submit" variant="primary" phx-disable-with="Placing order...">
-              Place Order
-            </.button>
-          </form>
-
-          <div class="mt-6 text-center text-sm text-gray-500">
-            <p>
-              or
-              <a href={~p"/lot"} class="font-medium text-indigo-600 hover:text-indigo-500">
-                Continue Shopping <span aria-hidden="true">&rarr;</span>
-              </a>
+          <div class="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              Your Cart
+            </h1>
+            <p class="mt-4 text-lg/8 text-gray-300 max-w-2xl mx-auto">
+              Review your selections and place your order for local pickup.
             </p>
           </div>
         </div>
-      </div>
+
+        <%!-- Cart content --%>
+        <div class="mx-auto max-w-4xl px-6 lg:px-8 py-16 sm:py-24">
+          <%!-- Empty state --%>
+          <div :if={@cart.items == []} class="text-center py-16">
+            <svg
+              class="mx-auto size-12 text-base-content/40"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+              />
+            </svg>
+            <h3 class="mt-4 text-lg font-semibold text-base-content">Your cart is empty</h3>
+            <p class="mt-2 text-sm text-base-content/60 max-w-md mx-auto">
+              Browse our current wine selection and add your favorites.
+            </p>
+            <div class="mt-6">
+              <.link
+                navigate={~p"/lot"}
+                class="inline-flex items-center rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500"
+              >
+                Browse Wines
+              </.link>
+            </div>
+          </div>
+
+          <%!-- Cart items --%>
+          <div :if={@cart.items != []}>
+            <div class="space-y-3">
+              <div
+                :for={item <- @cart.items}
+                class="flex items-center justify-between rounded-2xl bg-base-100 ring-1 ring-base-300 p-4 sm:p-6"
+              >
+                <div class="flex-1">
+                  <.link
+                    navigate={~p"/wines/#{item.wine.id}"}
+                    class="font-semibold text-base-content hover:text-primary transition-colors"
+                  >
+                    {item.wine.name}
+                  </.link>
+                  <p class="mt-0.5 text-sm text-base-content/60">
+                    ${item.price_when_carted}/bottle &middot; ${ShoppingCart.cart_item_subtotal(item)}
+                  </p>
+                </div>
+                <div class="flex items-center gap-3 ml-4">
+                  <div class="flex items-center rounded-lg ring-1 ring-base-300">
+                    <button
+                      phx-click="decrement"
+                      phx-value-wine-id={item.wine_id}
+                      class="px-2.5 py-1.5 text-sm font-medium text-base-content hover:bg-base-200 rounded-l-lg transition-colors"
+                    >
+                      -
+                    </button>
+                    <span class="px-3 py-1.5 text-sm font-semibold text-base-content min-w-[2.5rem] text-center">
+                      {item.quantity}
+                    </span>
+                    <button
+                      phx-click="increment"
+                      phx-value-wine-id={item.wine_id}
+                      class="px-2.5 py-1.5 text-sm font-medium text-base-content hover:bg-base-200 rounded-r-lg transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    phx-click="remove_item"
+                    phx-value-wine-id={item.wine_id}
+                    class="inline-flex items-center rounded-md bg-base-100 px-2.5 py-1.5 text-sm font-medium text-error ring-1 ring-inset ring-error/30 hover:bg-error/10 transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <%!-- Summary + checkout --%>
+            <div class="mt-8 rounded-2xl bg-base-200 p-6 sm:p-8">
+              <div class="flex items-center justify-between mb-6">
+                <span class="text-lg font-semibold text-base-content">Cart Total</span>
+                <span class="text-2xl font-semibold text-base-content">
+                  ${ShoppingCart.cart_total(@cart)}
+                </span>
+              </div>
+
+              <form phx-submit="place_order" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-base-content">Notes (optional)</label>
+                  <textarea
+                    name="notes"
+                    rows="2"
+                    class="mt-1 block w-full rounded-lg border-base-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    placeholder="Any special requests..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  phx-disable-with="Placing order..."
+                  class="w-full inline-flex items-center justify-center rounded-md bg-indigo-600 px-3.5 py-3 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 transition-colors"
+                >
+                  Place Order
+                </button>
+              </form>
+
+              <div class="mt-4 text-center">
+                <.link
+                  navigate={~p"/lot"}
+                  class="text-sm font-medium text-primary hover:text-primary/80"
+                >
+                  Continue Shopping &rarr;
+                </.link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
-    tastings =
-      Events.list_upcoming_tastings()
-
     {:ok,
      socket
-     |> assign(:page_title, "Your Cart")
-     |> assign(:tastings, tastings)}
+     |> assign(:page_title, "Your Cart")}
   end
 
   @impl true
+  def handle_event("increment", %{"wine-id" => wine_id}, socket) do
+    scope = socket.assigns.current_scope
+    cart = socket.assigns.cart
+    item = Enum.find(cart.items, &(to_string(&1.wine_id) == wine_id))
+
+    {:ok, updated_cart} =
+      ShoppingCart.update_item_quantity(scope, cart, item.wine_id, item.quantity + 1)
+
+    {:noreply,
+     socket
+     |> assign(:cart, updated_cart)
+     |> push_event("cart-updated", %{count: ShoppingCart.count_cart_items(updated_cart)})}
+  end
+
+  def handle_event("decrement", %{"wine-id" => wine_id}, socket) do
+    scope = socket.assigns.current_scope
+    cart = socket.assigns.cart
+    item = Enum.find(cart.items, &(to_string(&1.wine_id) == wine_id))
+
+    if item.quantity <= 1 do
+      {:ok, updated_cart} = ShoppingCart.remove_item_from_cart(scope, cart, item.wine_id)
+
+      {:noreply,
+       socket
+       |> assign(:cart, updated_cart)
+       |> push_event("cart-updated", %{count: ShoppingCart.count_cart_items(updated_cart)})}
+    else
+      {:ok, updated_cart} =
+        ShoppingCart.update_item_quantity(scope, cart, item.wine_id, item.quantity - 1)
+
+      {:noreply,
+       socket
+       |> assign(:cart, updated_cart)
+       |> push_event("cart-updated", %{count: ShoppingCart.count_cart_items(updated_cart)})}
+    end
+  end
+
   def handle_event("remove_item", %{"wine-id" => wine_id}, socket) do
     scope = socket.assigns.current_scope
     cart = socket.assigns.cart
 
     {:ok, updated_cart} = ShoppingCart.remove_item_from_cart(scope, cart, wine_id)
-    {:noreply, assign(socket, :cart, updated_cart)}
+
+    {:noreply,
+     socket
+     |> assign(:cart, updated_cart)
+     |> push_event("cart-updated", %{count: ShoppingCart.count_cart_items(updated_cart)})}
   end
 
   def handle_event("place_order", params, socket) do
@@ -130,17 +218,16 @@ defmodule PourWeb.CartLive.Show do
 
     opts =
       []
-      |> maybe_add(:tasting_id, params["tasting_id"])
       |> maybe_add(:notes, params["notes"])
 
     case Orders.create_order_from_cart(scope, opts) do
       {:ok, _order} ->
-        # Reload the cart (now empty)
         updated_cart = ShoppingCart.get_cart(scope)
 
         {:noreply,
          socket
          |> assign(:cart, updated_cart)
+         |> push_event("cart-updated", %{count: ShoppingCart.count_cart_items(updated_cart)})
          |> put_flash(:info, "Order placed!")
          |> push_navigate(to: ~p"/orders")}
 

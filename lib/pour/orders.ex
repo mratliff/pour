@@ -8,7 +8,6 @@ defmodule Pour.Orders do
   alias Pour.Orders.Notifier
 
   def create_order_from_cart(scope, opts \\ []) do
-    tasting_id = opts[:tasting_id]
     notes = opts[:notes]
 
     cart = ShoppingCart.get_cart(scope)
@@ -23,7 +22,6 @@ defmodule Pour.Orders do
           %Order{}
           |> Order.create_changeset(%{
             user_id: scope.user.id,
-            tasting_id: tasting_id,
             notes: notes,
             status: "placed",
             placed_at: now
@@ -86,13 +84,6 @@ defmodule Pour.Orders do
         status -> where(query, [o], o.status == ^status)
       end
 
-    query =
-      case Map.get(filters, :tasting_id) do
-        nil -> query
-        "" -> query
-        tasting_id -> where(query, [o], o.tasting_id == ^tasting_id)
-      end
-
     Repo.all(query)
   end
 
@@ -137,13 +128,6 @@ defmodule Pour.Orders do
         },
         order_by: [desc: sum(oi.quantity)]
       )
-
-    query =
-      case Map.get(filters, :tasting_id) do
-        nil -> query
-        "" -> query
-        tasting_id -> where(query, [oi, o], o.tasting_id == ^tasting_id)
-      end
 
     query =
       case Map.get(filters, :statuses) do
